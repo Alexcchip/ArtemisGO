@@ -1,0 +1,13 @@
+# Dependencies
+frontend/node_modules/
+
+# Next.js build
+frontend/.next/
+
+# Go binary
+backend/artemisgo
+backend/artemisgo.exe
+
+# OS
+.DS_Store
+Thumbs.db
