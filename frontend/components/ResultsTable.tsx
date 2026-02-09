@@ -4,12 +4,26 @@ interface ResultsTableProps {
   columns: string[];
   rows: (string | number | null)[][];
   error?: string;
+  totalRows?: number;
+}
+
+function formatCell(cell: string | number | null): React.ReactNode {
+  if (cell === null) {
+    return <span className="text-gray-300 italic">NULL</span>;
+  }
+  if (typeof cell === "number") {
+    return Number.isInteger(cell)
+      ? cell.toLocaleString()
+      : cell.toLocaleString(undefined, { maximumFractionDigits: 3 });
+  }
+  return String(cell);
 }
 
 export default function ResultsTable({
   columns,
   rows,
   error,
+  totalRows,
 }: ResultsTableProps) {
   if (error) {
     return (
@@ -51,11 +65,7 @@ export default function ResultsTable({
                   key={j}
                   className="px-4 py-2 border-b border-gray-100 whitespace-nowrap text-gray-600"
                 >
-                  {cell === null ? (
-                    <span className="text-gray-300 italic">NULL</span>
-                  ) : (
-                    String(cell)
-                  )}
+                  {formatCell(cell)}
                 </td>
               ))}
             </tr>
@@ -65,6 +75,13 @@ export default function ResultsTable({
       {rows.length === 0 && (
         <div className="p-4 text-center text-gray-400 text-sm">
           Query returned no rows
+        </div>
+      )}
+      {columns.length > 0 && rows.length > 0 && (
+        <div className="px-4 py-2 bg-gray-50 border-t border-gray-200 text-xs text-gray-500">
+          {totalRows && totalRows > rows.length
+            ? `Showing ${rows.length.toLocaleString()} of ${totalRows.toLocaleString()} rows`
+            : `${rows.length.toLocaleString()} row${rows.length !== 1 ? "s" : ""} returned`}
         </div>
       )}
     </div>

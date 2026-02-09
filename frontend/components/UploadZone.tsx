@@ -4,9 +4,10 @@ import { useCallback, useState } from "react";
 
 interface UploadZoneProps {
   onUpload: (file: File) => void;
+  uploadProgress?: number | null;
 }
 
-export default function UploadZone({ onUpload }: UploadZoneProps) {
+export default function UploadZone({ onUpload, uploadProgress }: UploadZoneProps) {
   const [dragging, setDragging] = useState(false);
 
   const handleDrop = useCallback(
@@ -23,12 +24,34 @@ export default function UploadZone({ onUpload }: UploadZoneProps) {
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (file) onUpload(file);
+      e.target.value = "";
     },
     [onUpload]
   );
 
+  if (uploadProgress != null) {
+    const processing = uploadProgress >= 100;
+    return (
+      <div className="flex flex-col items-center justify-center border-2 border-blue-300 rounded-xl p-16 bg-blue-50">
+        <p className="text-lg font-medium text-gray-700 mb-4">
+          {processing ? "Processing CSV..." : "Uploading..."}
+        </p>
+        <div className="w-full bg-gray-200 rounded-full h-3 mb-2">
+          <div
+            className={`h-3 rounded-full transition-all duration-200 ${processing ? "bg-green-500 animate-pulse" : "bg-blue-500"}`}
+            style={{ width: "100%" }}
+          />
+        </div>
+        <p className="text-sm text-gray-600">
+          {processing ? "Inserting rows into database..." : `${uploadProgress}%`}
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <div
+    <label
+      htmlFor="csv-upload"
       onDragOver={(e) => {
         e.preventDefault();
         setDragging(true);
@@ -65,12 +88,9 @@ export default function UploadZone({ onUpload }: UploadZoneProps) {
         className="hidden"
         id="csv-upload"
       />
-      <label
-        htmlFor="csv-upload"
-        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors cursor-pointer text-sm font-medium"
-      >
+      <span className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors cursor-pointer text-sm font-medium">
         Choose File
-      </label>
-    </div>
+      </span>
+    </label>
   );
 }

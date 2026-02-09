@@ -1,3 +1,34 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Override Tailwind preflight that breaks CodeMirror */
+.cm-editor .cm-content {
+  color: #000000;
+  caret-color: #000000;
+}
+
+.cm-editor .cm-cursor,
+.cm-editor .cm-dropCursor {
+  border-left-color: #000000 !important;
+  border-left-width: 2px !important;
+}
+
+.cm-editor .cm-line {
+  color: #000000;
+}
+
+@keyframes chat-dot {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  30% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+
+.animate-chat-dot {
+  animation: chat-dot 1.4s ease-in-out infinite;
+}

@@ -1,9 +1,9 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useMemo, useRef, useEffect } from "react";
 import CodeMirror from "@uiw/react-codemirror";
 import { sql } from "@codemirror/lang-sql";
-import { keymap } from "@codemirror/view";
+import { keymap, EditorView } from "@codemirror/view";
 
 interface SqlEditorProps {
   value: string;
@@ -12,15 +12,10 @@ interface SqlEditorProps {
 }
 
 export default function SqlEditor({ value, onChange, onRun }: SqlEditorProps) {
-  const runKeymap = keymap.of([
-    {
-      key: "Mod-Enter",
-      run: () => {
-        onRun();
-        return true;
-      },
-    },
-  ]);
+  const onRunRef = useRef(onRun);
+  useEffect(() => {
+    onRunRef.current = onRun;
+  }, [onRun]);
 
   const handleChange = useCallback(
     (val: string) => {
@@ -29,15 +24,43 @@ export default function SqlEditor({ value, onChange, onRun }: SqlEditorProps) {
     [onChange]
   );
 
+  const runKeymap = useMemo(() => {
+    return keymap.of([
+      {
+        key: "Mod-Enter",
+        run: () => {
+          onRunRef.current();
+          return true;
+        },
+      },
+    ]);
+  }, []);
+
+  const customTheme = useMemo(() => EditorView.theme({
+    "&": {
+      fontSize: "14px",
+      backgroundColor: "#ffffff",
+    },
+    ".cm-content": {
+      padding: "8px",
+      minHeight: "160px",
+    },
+    ".cm-scroller": {
+      fontFamily: "monospace",
+    },
+    ".cm-focused": {
+      outline: "none",
+    },
+  }), []);
+
   return (
     <div className="flex flex-col gap-2">
       <div className="border border-gray-200 rounded-lg overflow-hidden">
         <CodeMirror
           value={value}
           height="160px"
-          extensions={[sql(), runKeymap]}
+          extensions={[sql(), runKeymap, customTheme]}
           onChange={handleChange}
-          theme="light"
           placeholder="SELECT * FROM tablename LIMIT 10"
         />
       </div>

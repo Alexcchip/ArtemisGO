@@ -8,6 +8,10 @@ frontend/.next/
 backend/artemisgo
 backend/artemisgo.exe
 
+# Env
+.env
+backend/.env
+
 # OS
 .DS_Store
 Thumbs.db
